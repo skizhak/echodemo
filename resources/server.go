@@ -8,6 +8,8 @@ import (
 func RunServer(c ControllerInterface) {
 	e := echo.New()
 
+	e.Static("/", "web/dist")
+
 	for path, handler := range c.routes() {
 		e.GET(path, handler.GET)
 	}
