@@ -8,14 +8,20 @@ import (
 func RunServer(c ControllerInterface) {
 	e := echo.New()
 
+	// Routes
 	e.Static("/", "web/dist")
+	register(e, c.routes())
 
-	for path, handler := range c.routes() {
-		e.GET(path, handler.GET)
-	}
 	e.Logger.Fatal(e.Start(":9001"))
 }
 
 func register(e *echo.Echo, routes map[string]*Handler) {
-
+	for path, handler := range routes {
+		if handler.GET != nil {
+			e.GET(path, handler.GET)
+		}
+		if handler.POST != nil {
+			e.POST(path, handler.POST)
+		}
+	}
 }
