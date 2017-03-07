@@ -1,0 +1,26 @@
+<form id="{{id}}" class="cc-payment mdl-card">
+  <span class="payment-errors"></span>
+
+  <div class="form-row mdl-textfield mdl-js-textfield">
+    <input class="mdl-textfield__input" type="text" size="20" data-stripe="number">
+    <label class="mdl-textfield__label"><span>Card Number</span></label>
+  </div>
+
+  <div class="form-row">
+    <div class="mdl-textfield mdl-js-textfield expiry-month">
+      <input class="mdl-textfield__input" type="text" size="2" data-stripe="exp_month">
+      <label class="mdl-textfield__label"><span>(MM)</span></label>
+    </div>
+    <span>/</span>
+    <div class="mdl-textfield mdl-js-textfield expiry-year">
+      <input class="mdl-textfield__input" type="text" size="2" data-stripe="exp_year">
+      <label class="mdl-textfield__label"><span>(YY)</span></label>
+    </div>
+    <div class="form-row mdl-textfield mdl-js-textfield cvc">
+      <input class="mdl-textfield__input" type="text" size="4" data-stripe="cvc">
+      <label class="mdl-textfield__label"><span>CVC</span></label>
+    </div>
+  </div>
+
+  <input type="submit" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect" value="Submit Payment">
+</form>

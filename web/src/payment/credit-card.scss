@@ -1,0 +1,15 @@
+.cc-payment {
+    &.mdl-card {
+        width: 350px;
+        padding: 15px
+    }
+    
+    .expiry-month, .expiry-year {
+        max-width: 50px
+    }
+
+    .cvc {
+        max-width: 100px;
+        margin-left: 40px
+    }
+}
