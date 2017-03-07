@@ -39,8 +39,8 @@ export default (env = defaultEnv) => {
   }]
   
   const externals = {
-    'jquery': {amd: 'jquery', root: 'jQuery'},
-    'lodash': {amd: 'lodash', root: '_'},
+    // 'jquery': {amd: 'jquery', root: 'jQuery'},
+    // 'lodash': {amd: 'lodash', root: '_'},
     'backbone': {amd: 'backbone', root: 'Backbone'},
   }
 
@@ -66,7 +66,7 @@ export default (env = defaultEnv) => {
     fileName = `${fileName}.bundle`
   }
   // Let's put css under css directory.
-  plugins.push(new ExtractTextPlugin(fileName + '.css'))
+  plugins.push(new ExtractTextPlugin(`css/${fileName}.css`))
 
   const configList = []
 

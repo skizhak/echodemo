@@ -4,7 +4,8 @@
   "description": "",
   "main": "",
   "scripts": {
-    "build": "webpack --env.prod --config webpack.config.babel.js"
+    "build": "webpack --env.prod --config webpack.config.babel.js",
+    "dev": "webpack --progress --colors --watch --env.dev"
   },
   "license": "Apache-2.0",
   "devDependencies": {
