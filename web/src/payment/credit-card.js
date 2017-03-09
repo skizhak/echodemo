@@ -11,11 +11,20 @@ export default class ccPayment {
     }
     render () {
         applyTemplate(".page-content", userTemplate({id: this.userFormId}))
-        applyTemplate(".page-content", ccTemplate({id: this.ccFormId}), true)
-        let $ccForm = $(`#${this.ccFormId}`)
-        $ccForm.submit((event) => {
+        let $userForm = $(`#${this.userFormId}`)
+
+        $userForm.find('#next').on('click', event => {
+            event.preventDefault()
+            applyTemplate(`#${this.userFormId} .payment`, ccTemplate({id: this.ccFormId}), true)
+            $userForm.find('.payment').css('visibility', 'visible')
+            $userForm.find('.submit').prop('disabled', false)
+        })
+
+        $userForm.submit(event => {
+            let $ccForm = $(`#${this.ccFormId}`)
+
             // Disable the submit button to prevent repeated clicks:
-            $ccForm.find('.submit').prop('disabled', true)
+            $userForm.find('.submit').prop('disabled', true)
 
             // Request a token from Stripe:
             Stripe.card.createToken($ccForm, this.stripeResponseHandler.bind(this))
@@ -27,23 +36,33 @@ export default class ccPayment {
     stripeResponseHandler (status, response) {
         // Grab the form:
         let $ccForm = $(`#${this.ccFormId}`)
+        let $userForm = $(`#${this.userFormId}`)
 
         if (response.error) { // Problem!
 
             // Show the errors on the form:
             $ccForm.find('.payment-errors').text(response.error.message)
-            $ccForm.find('.submit').prop('disabled', false) // Re-enable submission
+            $userForm.find('.submit').prop('disabled', false) // Re-enable submission
 
         } else { // Token was created!
-
-            // Get the token ID:
-            let token = response.id
-
-            // Insert the token ID into the form so it gets submitted to the server:
-            $ccForm.append($('<input type="hidden" name="stripeToken">').val(token))
-
-            // Submit the form:
-            // $ccForm.get(0).submit()
+            let userData = this.prepareUserDataJson($userForm.serializeArray())
+            userData['stripe_token'] = response.id
+            
+            $.ajax({
+                type: "POST",
+                url: '/users',
+                data: JSON.stringify(userData),
+                contentType: 'application/json'
+            }).done(response => {
+                console.log(response)
+            })
         }
+    }
+    prepareUserDataJson (userData) {
+        const userJSON = {}
+        $.each(userData, (idx, data) => {
+            userJSON[data.name] = data.value
+        })
+        return userJSON
     }
 }

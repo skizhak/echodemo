@@ -1,7 +1,7 @@
 <form id="{{id}}" class="user-profile mdl-card">
     <div class="form-row mdl-textfield mdl-js-textfield">
         <label class="mdl-textfield__label">Full name:</label>
-        <input class="mdl-textfield__input" type="text" name="full_name" />
+        <input class="mdl-textfield__input" type="text" name="name" />
     </div>
     <div class="form-row mdl-textfield mdl-js-textfield">
         <label class="mdl-textfield__label">Email:</label>
@@ -11,4 +11,9 @@
         <label class="mdl-textfield__label">Contact phone:</label>
         <input class="mdl-textfield__input" type="text" name="phone" />
     </div>
+    <button id="next" class="mdl-button mdl-js-button mdl-button--fab mdl-button--colored next">
+        <i class="material-icons">add</i>
+    </button>
+    <div class="payment" style="visibility: hidden"></div>
+    <input type="submit" disabled="true" class="submit mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect" value="Register">
 </form>
