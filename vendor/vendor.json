@@ -71,6 +71,30 @@
 			"revisionTime": "2017-02-16T23:59:08Z"
 		},
 		{
+			"checksumSHA1": "bfRNH6AMDpyYdDsAEVEBRGHNzpA=",
+			"path": "github.com/stripe/stripe-go",
+			"revision": "9cc2162607f5e21aa59ca074c1eb4dd62f2605f4",
+			"revisionTime": "2017-03-02T15:48:42Z"
+		},
+		{
+			"checksumSHA1": "A3VQHd0br/oViLQUV1zf2TMTiHY=",
+			"path": "github.com/stripe/stripe-go/charge",
+			"revision": "9cc2162607f5e21aa59ca074c1eb4dd62f2605f4",
+			"revisionTime": "2017-03-02T15:48:42Z"
+		},
+		{
+			"checksumSHA1": "2dVO9xvrpjU6VIGHa6eHHllHqJM=",
+			"path": "github.com/stripe/stripe-go/customer",
+			"revision": "9cc2162607f5e21aa59ca074c1eb4dd62f2605f4",
+			"revisionTime": "2017-03-02T15:48:42Z"
+		},
+		{
+			"checksumSHA1": "y5AD80EvDutFqGuAYsBtcya6ntM=",
+			"path": "github.com/stripe/stripe-go/orderitem",
+			"revision": "9cc2162607f5e21aa59ca074c1eb4dd62f2605f4",
+			"revisionTime": "2017-03-02T15:48:42Z"
+		},
+		{
 			"checksumSHA1": "5q4Lyr1RgyO9j66pTmz1M63rQvs=",
 			"path": "github.com/tylerb/graceful",
 			"revision": "d72b0151351a13d0421b763b88f791469c4f5dc7",
