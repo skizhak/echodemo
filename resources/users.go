@@ -1,11 +1,15 @@
 package resources
 
+import _ "github.com/go-sql-driver/mysql"
+
 type (
 	// User object
 	User struct {
 		ID          string              `json:"id"`
 		Name        string              `json:"name"`
+		Description string              `json:"description"`
 		Email       string              `json:"email"`
+		Password    string              `json:"password"`
 		AccountID   string              `json:"account_id"`
 		StripeToken string              `json:"stripe_token"`
 		StripeID    string              `json:"stripe_id"`
