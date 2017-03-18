@@ -61,8 +61,6 @@ create table `users` (
 
 -- +goose Down
 -- SQL section 'Down' is executed when this migration is rolled back
-drop table accounts;
-
 drop table payment_historys;
 
 drop table payment_methods;
@@ -70,3 +68,5 @@ drop table payment_methods;
 drop table bills;
 
 drop table users;
+
+drop table accounts;

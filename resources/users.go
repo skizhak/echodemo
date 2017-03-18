@@ -1,19 +1,20 @@
 package resources
 
 import _ "github.com/go-sql-driver/mysql"
+import "github.com/skizhak/echodemo/resources/payments"
 
 type (
 	// User object
 	User struct {
-		ID          string              `json:"id"`
-		Name        string              `json:"name"`
-		Description string              `json:"description"`
-		Email       string              `json:"email"`
-		Password    string              `json:"password"`
-		AccountID   string              `json:"account_id"`
-		StripeToken string              `json:"stripe_token"`
-		StripeID    string              `json:"stripe_id"`
-		Payments    map[string]*Payment `json:"payments"`
+		ID             string                        `json:"id"`
+		Name           string                        `json:"name"`
+		Description    string                        `json:"description"`
+		Email          string                        `json:"email"`
+		Password       string                        `json:"password"`
+		AccountID      string                        `json:"account_id"`
+		PaymentService string                        `json:"payment_service"`
+		PaymentToken   string                        `json:"payment_token"`
+		Payments       map[string]*payments.C3Charge `json:"payments"`
 	}
 )
 
