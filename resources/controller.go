@@ -172,6 +172,24 @@ func (c *Controller) getPaymentForAccount(accountID string) (string, string, err
 	return service, paymentID, err
 }
 
+func (c *Controller) getPaymentHistroyForAccount(accountID string, tx *sql.Tx) ([]*Bill, error) {
+	var payments []*Bill
+	rows, err := tx.Query("SELECT id, name, description, account_id, date FROM payment_historys WHERE account_id = ?", accountID)
+	defer rows.Close()
+	for rows.Next() {
+		var payment Bill
+		err := rows.Scan(&payment.ID, &payment.Name, &payment.Description, &payment.AccountID, &payment.Date)
+		payments = append(payments, &payment)
+		if err != nil {
+			log.Fatal(err)
+		}
+	}
+	if rows.Err() != nil {
+		log.Fatal("Error iterating rows on payment_historys table", rows.Err())
+	}
+	return payments, err
+}
+
 func (c *Controller) createUser(ec echo.Context) error {
 	u := &User{}
 	if err := ec.Bind(u); err != nil {
@@ -179,7 +197,6 @@ func (c *Controller) createUser(ec echo.Context) error {
 	}
 	// Start a transaction.
 	tx, err := c.DB.Begin()
-	// var stmt *sql.Stmt
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -195,20 +212,7 @@ func (c *Controller) createUser(ec echo.Context) error {
 			return ec.JSON(http.StatusInternalServerError, "Retry after sometime.")
 		}
 		u.AccountID = account.ID
-		// u.AccountID = utils.GenerateID(8)
-		// u.Description = "Admin Account"
-		// stmt = c.prepare("INSERT INTO accounts VALUES (?, ?, ?, ?)", tx)
-		// _, err = stmt.Exec(u.AccountID, u.Name, u.Description, "active")
-		// if err != nil {
-		// 	log.Fatal("Insert into accounts table failed.", err)
-		// }
 	} else {
-		// var accountStatus string
-		// err := c.DB.QueryRow("SELECT status from accounts where account_id = ?", u.AccountID).Scan(&accountStatus)
-		// if err != nil && err == sql.ErrNoRows {
-		// 	log.Fatal("Asosciated account not found.", err)
-		// 	return ec.JSON(http.StatusFailedDependency, "Account ID does not exist.")
-		// }
 		accountStatus, _ := c.getAccountStatus(u.AccountID)
 		if accountStatus != "active" {
 			log.Fatal("Asosciated account is not Active.", err)
@@ -216,46 +220,19 @@ func (c *Controller) createUser(ec echo.Context) error {
 		}
 	}
 	log.Println("Creating User: ", u.ID)
-	// stmt = c.prepare("INSERT INTO users VALUES (?, ?, ?, ?, ?, ?)", tx)
-	// _, err = stmt.Exec(u.ID, u.Name, u.Description, u.Email, u.Password, u.AccountID)
-	// if err != nil {
-	// 	log.Fatal("Insert into users table failed.", err)
-	// 	return ec.JSON(http.StatusInternalServerError, "Retry Later.")
-	// }
 
 	err = c.insertUserDB(u, tx)
 	if err != nil {
 		return ec.JSON(http.StatusInternalServerError, "Retry Later.")
 	}
 
-	// Stripe API
+	// Payment API
 	ps := payments.NewService(u.PaymentService)
 	customer, err := ps.CreateCustomer(u.Email, u.PaymentToken)
 	err = c.insertPaymentMethodsDB(customer, u, tx)
 	if err != nil {
 		return ec.JSON(http.StatusInternalServerError, "Retry Later.")
 	}
-
-	// stripeCustomerParams := &stripe.CustomerParams{
-	// 	Email: u.Email,
-	// }
-	// if u.StripeToken == "" {
-	// 	log.Fatal("Stripe Token not found!")
-	// 	return ec.JSON(http.StatusBadRequest, "Stripe Token not found")
-	// }
-	// stripeCustomerParams.SetSource(u.StripeToken)
-	// stripeCustomer, err := customer.New(stripeCustomerParams)
-	// if err != nil {
-	// 	log.Fatal("Stripe Customer creation failed", err)
-	// }
-
-	// stmt = c.prepare("INSERT INTO payment_methods(id, name, description, token, account_id) VALUES (?, ?, ?, ?, ?)", tx)
-	// _, err = stmt.Exec(stripeCustomer.ID, "Stripe", stripeCustomer.Desc, u.StripeToken, u.AccountID)
-	// if err != nil {
-	// 	fmt.Println("Insert into payment_methods table failed.")
-	// 	log.Fatal(err)
-	// }
-	// stmt.Close()
 
 	// Commit the transaction.
 	err = tx.Commit()
@@ -267,31 +244,13 @@ func (c *Controller) createUser(ec echo.Context) error {
 
 func (c *Controller) getPayment(ec echo.Context) error {
 	id := ec.Param("id")
-	var accountID string
-	var payments []*Bill
 	// Get AccountID for the user
-	err := c.DB.QueryRow("SELECT account_id FROM users WHERE id = ?", id).Scan(&accountID)
-	if err != nil {
-		fmt.Println("UserID doesnt exist")
-		log.Fatal(err)
-	}
+	accountID, _ := c.getUserAccountID(id)
 	tx, err := c.DB.Begin()
 	if err != nil {
 		log.Fatal(err)
 	}
-	rows, err := tx.Query("SELECT id, name, description, account_id, date FROM payment_historys WHERE account_id = ?", accountID)
-	defer rows.Close()
-	for rows.Next() {
-		var payment Bill
-		err := rows.Scan(&payment.ID, &payment.Name, &payment.Description, &payment.AccountID, &payment.Date)
-		payments = append(payments, &payment)
-		if err != nil {
-			log.Fatal(err)
-		}
-	}
-	if rows.Err() != nil {
-		log.Fatal("Error iterating rows on payment_historys table", rows.Err())
-	}
+	payments, _ := c.getPaymentHistroyForAccount(accountID, tx)
 	tx.Commit()
 	return ec.JSON(http.StatusOK, payments)
 }

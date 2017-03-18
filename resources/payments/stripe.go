@@ -64,6 +64,8 @@ func (s *StripeService) Charge(id string, amount uint64, currency string) (*C3Ch
 			ID: ch.Customer.ID,
 		},
 		PaymentMethod: string(ch.Source.Type),
+		ReceiptNumber: ch.ReceiptNumber,
 		Service:       "Stripe",
+		Status:        ch.Status,
 	}, err
 }

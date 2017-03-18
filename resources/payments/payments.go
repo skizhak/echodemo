@@ -23,7 +23,6 @@ type C3Charge struct {
 	Currency      string      `json:"currency"`
 	Customer      *C3Customer `json:"customer"`
 	Desc          string      `json:"description"`
-	Email         string      `json:"receipt_email"`
 	PaymentMethod string      `json:"payment_method"`
 	ReceiptNumber string      `json:"receipt_number"`
 	ID            string      `json:"id"`
