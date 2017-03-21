@@ -46,7 +46,8 @@ export default class ccPayment {
 
         } else { // Token was created!
             let userData = this.prepareUserDataJson($userForm.serializeArray())
-            userData['stripe_token'] = response.id
+            userData['payment_service'] = "Stripe"
+            userData['payment_token'] = response.id
             
             $.ajax({
                 type: "POST",
