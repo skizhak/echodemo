@@ -23,6 +23,7 @@ type (
 	// Controller
 	Controller struct {
 		DB     *sql.DB
+		PS     payments.PaymentService
 		Logger echo.Logger
 		users  UserMap
 	}
@@ -190,6 +191,7 @@ func (c *Controller) getPaymentHistroyForAccount(accountID string, tx *sql.Tx) (
 	return payments, err
 }
 
+// CreateUser
 func (c *Controller) createUser(ec echo.Context) error {
 	u := &User{}
 	if err := ec.Bind(u); err != nil {
@@ -227,8 +229,13 @@ func (c *Controller) createUser(ec echo.Context) error {
 	}
 
 	// Payment API
-	ps := payments.NewService(u.PaymentService)
-	customer, err := ps.CreateCustomer(u.Email, u.PaymentToken)
+	// ps := payments.NewService(u.PaymentService)
+	// customer, err := ps.CreateCustomer(u.Email, u.PaymentToken)
+	customer, err := c.PS.CreateCustomer(u.Email, u.PaymentToken)
+	if err != nil {
+		return ec.JSON(http.StatusInternalServerError, "Retry Later.")
+	}
+	// Update payment_methods table.
 	err = c.insertPaymentMethodsDB(customer, u, tx)
 	if err != nil {
 		return ec.JSON(http.StatusInternalServerError, "Retry Later.")
@@ -260,7 +267,7 @@ func (c *Controller) postPayment(ec echo.Context) error {
 
 	accountID, _ := c.getUserAccountID(id)
 	// Get Payment ID for the account
-	service, paymentID, _ := c.getPaymentForAccount(accountID)
+	_, paymentID, _ := c.getPaymentForAccount(accountID)
 
 	type payment struct {
 		Amount   uint64
@@ -271,8 +278,9 @@ func (c *Controller) postPayment(ec echo.Context) error {
 		fmt.Println("Bind error: ", err)
 		return nil
 	}
-	ps := payments.NewService(service)
-	charge, error := ps.Charge(paymentID, pmodel.Amount, pmodel.Currency)
+	// ps := payments.NewService(service)
+	// charge, error := ps.Charge(paymentID, pmodel.Amount, pmodel.Currency)
+	charge, error := c.PS.Charge(paymentID, pmodel.Amount, pmodel.Currency)
 	if error != nil {
 		return ec.JSON(http.StatusUnauthorized, charge)
 	}
@@ -325,5 +333,6 @@ func (c *Controller) Routes() map[string]*Handler {
 func CreateControllerService() *Controller {
 	return &Controller{
 		DB: ConnectDB(),
+		PS: payments.NewService("Stripe"),
 	}
 }

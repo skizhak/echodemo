@@ -69,3 +69,5 @@ func (s *StripeService) Charge(id string, amount uint64, currency string) (*C3Ch
 		Status:        ch.Status,
 	}, err
 }
+
+
